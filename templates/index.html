@@ -19,6 +19,7 @@ PDX-License-Identifier: MIT-0 (For details, see https://github.com/awsdocs/amazo
 </body>
 <script>
 
+
   document.getElementById("fileToUpload").addEventListener("change", function (event) {
     ProcessImage();
   }, false);
@@ -94,10 +95,10 @@ PDX-License-Identifier: MIT-0 (For details, see https://github.com/awsdocs/amazo
   function AnonLog() {
 
     // Configure the credentials provider to use your identity pool
-    AWS.config.region = 'RegionToUse'; // Region
-    AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-      IdentityPoolId: 'IdentityPoolIdToUse',
-    });
+AWS.config.region = ''; // 리전
+AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+    IdentityPoolId: 'us-east-1:ebae5639-fcb3-4c90-ba9b-0603c803703b',
+});
     // Make the call to obtain credentials
     AWS.config.credentials.get(function () {
       // Credentials will be available when this function is called.
@@ -106,5 +107,6 @@ PDX-License-Identifier: MIT-0 (For details, see https://github.com/awsdocs/amazo
       var sessionToken = AWS.config.credentials.sessionToken;
     });
   }
+
 </script>
 </html>
