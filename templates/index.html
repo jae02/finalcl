@@ -1,0 +1,99 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="aws-cognito-sdk.min.js"></script>
+    <script src="amazon-cognito-identity.min.js"></script>
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.16.0.min.js"></script>
+    <meta charset="UTF-8">
+    <title>Rekognition</title>
+</head>
+
+<body>
+<H1>Age Estimator</H1>
+<input type="file" name="fileToUpload" id="fileToUpload" accept="image/*">
+<p id="opResult"></p>
+</body>
+<script>
+
+
+    document.getElementById("fileToUpload").addEventListener("change", function (event) {
+        ProcessImage();
+    }, false);
+
+    function DetectFaces(imageData) {
+        AWS.region = "RegionToUse";
+        var rekognition = new AWS.Rekognition();
+        var params = {
+            Image: {
+                Bytes: imageData
+            },
+            Attributes: [
+                'ALL',
+            ]
+        };
+        rekognition.detectFaces(params, function (err, data) {
+            if (err) console.log(err, err.stack);
+            else {
+                var table = "<table><tr><th>Low</th><th>High</th></tr>";
+                for (var i = 0; i < data.FaceDetails.length; i++) {
+                    table += '<tr><td>' + data.FaceDetails[i].AgeRange.Low +
+                        '</td><td>' + data.FaceDetails[i].AgeRange.High + '</td></tr>';
+                }
+                table += "</table>";
+                document.getElementById("opResult").innerHTML = table;
+            }
+        });
+    }
+
+    function ProcessImage() {
+        AnonLog();
+        var control = document.getElementById("fileToUpload");
+        var file = control.files[0];
+
+        var reader = new FileReader();
+        reader.onload = (function (theFile) {
+            return function (e) {
+                AWS.region = "RegionToUse";
+                var rekognition = new AWS.Rekognition();
+                var params = {
+                    Image: {
+                        Bytes: e.target.result
+                    },
+                    Attributes: [
+                        'ALL',
+                    ]
+                };
+                rekognition.detectFaces(params, function (err, data) {
+                    if (err) console.log(err, err.stack);
+                    else {
+                        var table = "<table><tr><th>Low</th><th>High</th></tr>";
+                        for (var i = 0; i < data.FaceDetails.length; i++) {
+                            table += '<tr><td>' + data.FaceDetails[i].AgeRange.Low +
+                                '</td><td>' + data.FaceDetails[i].AgeRange.High + '</td></tr>';
+                        }
+                        table += "</table>";
+                        document.getElementById("opResult").innerHTML = table;
+                    }
+                });
+
+            };
+        })(file);
+        reader.readAsArrayBuffer(file);
+    }
+
+    function AnonLog() {
+
+        AWS.config.region = 'us-east-1';
+        AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+            IdentityPoolId: 'us-east-1:ebae5639-fcb3-4c90-ba9b-0603c803703b',
+        });
+        AWS.config.credentials.get(function () {
+            var accessKeyId = AWS.config.credentials.accessKeyId;
+            var secretAccessKey = AWS.config.credentials.secretAccessKey;
+            var sessionToken = AWS.config.credentials.sessionToken;
+        });
+    }
+
+</script>
+</html>
